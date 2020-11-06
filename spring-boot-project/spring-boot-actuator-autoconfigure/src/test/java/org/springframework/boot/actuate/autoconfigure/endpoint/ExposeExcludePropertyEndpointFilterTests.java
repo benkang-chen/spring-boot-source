@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2019 the original author or authors.
+ * Copyright 2012-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
 
 package org.springframework.boot.actuate.autoconfigure.endpoint;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
 
 import org.springframework.boot.actuate.endpoint.EndpointFilter;
 import org.springframework.boot.actuate.endpoint.EndpointId;
@@ -36,14 +34,10 @@ import static org.mockito.Mockito.mock;
  *
  * @author Phillip Webb
  */
+@Deprecated
 class ExposeExcludePropertyEndpointFilterTests {
 
 	private ExposeExcludePropertyEndpointFilter<?> filter;
-
-	@BeforeEach
-	void setup() {
-		MockitoAnnotations.initMocks(this);
-	}
 
 	@Test
 	void createWhenEndpointTypeIsNullShouldThrowException() {
@@ -147,6 +141,12 @@ class ExposeExcludePropertyEndpointFilterTests {
 		assertThat(match(EndpointId.of("fooBar"))).isTrue();
 	}
 
+	@Test // gh-20997
+	void matchWhenDashInName() throws Exception {
+		setupFilter("bus-refresh", "");
+		assertThat(match(EndpointId.of("bus-refresh"))).isTrue();
+	}
+
 	private void setupFilter(String include, String exclude) {
 		MockEnvironment environment = new MockEnvironment();
 		environment.setProperty("foo.include", include);
@@ -162,11 +162,11 @@ class ExposeExcludePropertyEndpointFilterTests {
 		return ((EndpointFilter) this.filter).match(endpoint);
 	}
 
-	private abstract static class TestExposableWebEndpoint implements ExposableWebEndpoint {
+	abstract static class TestExposableWebEndpoint implements ExposableWebEndpoint {
 
 	}
 
-	private abstract static class DifferentTestExposableWebEndpoint implements ExposableWebEndpoint {
+	abstract static class DifferentTestExposableWebEndpoint implements ExposableWebEndpoint {
 
 	}
 
